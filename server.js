@@ -1,10 +1,15 @@
 import express from "express";
 import axios from "axios";
+import { fileURLToPath } from "url";
+import { dirname, join } from "path";
+
+const __dirname = dirname(fileURLToPath(import.meta.url));
 
 const app = express();
-const PORT = 3001;
+const PORT = process.env.PORT || 3001;
 
 app.use(express.json());
+app.use(express.static(join(__dirname, "dist")));
 app.use((req, res, next) => {
   res.header("Access-Control-Allow-Origin", "*");
   res.header("Access-Control-Allow-Headers", "Content-Type");
@@ -47,6 +52,10 @@ app.post("/api/send-webhook", async (req, res) => {
     console.error("[webhook error]", err?.response?.data || err.message);
     res.status(500).json({ error: "Failed to send webhook", detail: err?.response?.data || err.message });
   }
+});
+
+app.get("*", (req, res) => {
+  res.sendFile(join(__dirname, "dist", "index.html"));
 });
 
 app.listen(PORT, () => {
