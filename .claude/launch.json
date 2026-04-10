@@ -1,0 +1,23 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "Vite Frontend",
+      "runtimeExecutable": "/Users/qusai/.nvm/versions/node/v24.14.1/bin/npm",
+      "runtimeArgs": ["run", "dev", "--", "--port", "5173"],
+      "port": 5173
+    },
+    {
+      "name": "Express Backend",
+      "runtimeExecutable": "/Users/qusai/.nvm/versions/node/v24.14.1/bin/node",
+      "runtimeArgs": ["server.js"],
+      "port": 3001
+    },
+    {
+      "name": "All (Concurrently)",
+      "runtimeExecutable": "/bin/bash",
+      "runtimeArgs": ["/Users/qusai/Rell Seas Watch/start.sh"],
+      "port": 5173
+    }
+  ]
+}
