@@ -66,6 +66,11 @@ async function checkPresence() {
       { headers: { "Content-Type": "application/json", "User-Agent": "Mozilla/5.0" } }
     );
     const presences = response.data.userPresences || [];
+    console.log("[poll result]", presences.map((p) => ({
+      userId: p.userId,
+      type: p.userPresenceType,
+      universeId: p.universeId ?? null,
+    })));
     const now = Date.now();
     const transitions = [];
 
@@ -193,7 +198,6 @@ setInterval(checkPresence, POLL_INTERVAL_MS);
 
 // --- Express ---
 app.use(express.json());
-app.use(express.static(join(__dirname, "dist")));
 app.use((req, res, next) => {
   res.header("Access-Control-Allow-Origin", "*");
   res.header("Access-Control-Allow-Headers", "Content-Type");
@@ -202,8 +206,13 @@ app.use((req, res, next) => {
   next();
 });
 
+// API routes first — before static/catch-all
+app.get("/api/health", (req, res) => {
+  res.json({ ok: true, webhookSet: !!DISCORD_WEBHOOK_URL });
+});
+
 app.get("/api/status", (req, res) => {
-  res.json({
+  const status = {
     users: Object.fromEntries(
       TRACKED_USERS.map((u) => [u.id, { name: u.name, ...userStates[u.id] }])
     ),
@@ -211,8 +220,18 @@ app.get("/api/status", (req, res) => {
     webhookConfigured: !!DISCORD_WEBHOOK_URL,
     events: eventLog,
     pollIntervalMs: POLL_INTERVAL_MS,
-  });
+  };
+  console.log("[/api/status]", JSON.stringify({
+    users: Object.fromEntries(
+      TRACKED_USERS.map((u) => [u.name, { inGame: userStates[u.id].inGame, inStudio: userStates[u.id].inStudio }])
+    ),
+    bothInGame: status.bothInGame,
+  }));
+  res.json(status);
 });
+
+// Static frontend + catch-all after API routes
+app.use(express.static(join(__dirname, "dist")));
 
 app.get("*", (req, res) => {
   res.sendFile(join(__dirname, "dist", "index.html"));
