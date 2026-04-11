@@ -7,7 +7,7 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 
 const app = express();
 const PORT = process.env.PORT || 3001;
-const DISCORD_WEBHOOK_URL = process.env.DISCORD_WEBHOOK_URL || "";
+const DISCORD_WEBHOOK_URL = process.env.DISCORD_WEBHOOK_URL ?? "";
 
 const UNIVERSE_ID = 7089993809;
 const TRACKED_USERS = [
@@ -238,6 +238,8 @@ app.get("*", (req, res) => {
 });
 
 app.listen(PORT, () => {
-  console.log(`Rell Seas Watch backend running on http://localhost:${PORT}`);
-  console.log(`Webhook configured: ${!!DISCORD_WEBHOOK_URL}`);
+  console.log(`[startup] Rell Seas Watch running on port ${PORT}`);
+  console.log(`[startup] DISCORD_WEBHOOK_URL set: ${!!process.env.DISCORD_WEBHOOK_URL}`);
+  console.log(`[startup] DISCORD_WEBHOOK_URL length: ${process.env.DISCORD_WEBHOOK_URL?.length ?? 0}`);
+  console.log(`[startup] DISCORD_WEBHOOK_URL starts with: ${process.env.DISCORD_WEBHOOK_URL?.slice(0, 30) ?? "(not set)"}`);
 });
